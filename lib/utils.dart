@@ -10,3 +10,7 @@ enum REQUEST_METHODS {
 bool isMethodCacheble(REQUEST_METHODS method) {
   return method == REQUEST_METHODS.GET || method == REQUEST_METHODS.POST;
 }
+
+bool isMethodNotCacheble(REQUEST_METHODS method) {
+  return !isMethodCacheble(method);
+}

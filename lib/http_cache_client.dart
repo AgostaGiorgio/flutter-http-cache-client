@@ -24,40 +24,51 @@ class HttpCacheClient {
       : _keyGenerator = keyGenerator ?? DefaultKeyGenerator(),
         _httpClient = httpClient ?? http.Client();
 
-  Future<http.Response> get(String uri, {Map<String, String>? headers}) async {
+  Future<http.Response> get(String uri,
+      {Map<String, String>? headers, Map<String, String>? queryParams}) async {
     return _handleRequest(
       method: REQUEST_METHODS.GET,
       uri: uri,
       headers: headers,
+      queryParams: queryParams,
     );
   }
 
   Future<http.Response> post(String uri,
-      {Map<String, String>? headers, Object? body}) async {
+      {Map<String, String>? headers,
+      Map<String, String>? queryParams,
+      Object? body}) async {
     return _handleRequest(
       method: REQUEST_METHODS.POST,
       uri: uri,
       headers: headers,
+      queryParams: queryParams,
       body: body,
     );
   }
 
   Future<http.Response> put(String uri,
-      {Map<String, String>? headers, Object? body}) {
+      {Map<String, String>? headers,
+      Map<String, String>? queryParams,
+      Object? body}) {
     return _handleRequest(
       method: REQUEST_METHODS.PUT,
       uri: uri,
       headers: headers,
+      queryParams: queryParams,
       body: body,
     );
   }
 
   Future<http.Response> delete(String uri,
-      {Map<String, String>? headers, Object? body}) {
+      {Map<String, String>? headers,
+      Map<String, String>? queryParams,
+      Object? body}) {
     return _handleRequest(
       method: REQUEST_METHODS.DELETE,
       uri: uri,
       headers: headers,
+      queryParams: queryParams,
       body: body,
     );
   }
@@ -66,10 +77,12 @@ class HttpCacheClient {
       {required REQUEST_METHODS method,
       required String uri,
       Map<String, String>? headers,
+      Map<String, String>? queryParams,
       Object? body}) async {
-    final fullUrl = Uri.parse('$baseUrl$uri');
+    final fullUrl =
+        Uri.parse('$baseUrl$uri').replace(queryParameters: queryParams);
 
-    if (!isMethodCacheble(method)) {
+    if (isMethodNotCacheble(method)) {
       if (method == REQUEST_METHODS.PUT) {
         return await _httpClient.put(
           fullUrl,

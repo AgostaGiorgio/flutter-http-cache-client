@@ -130,4 +130,51 @@ void main() {
       expect(callCount, 1); // Still cached, no network call
     });
   });
+
+  group('HttpCacheClient query parameters', () {
+    late int callCount;
+    late Uri? lastRequestedUri;
+    late HttpCacheClient client;
+
+    setUp(() {
+      callCount = 0;
+      lastRequestedUri = null;
+
+      final mockClient = MockClient((request) async {
+        callCount++;
+        lastRequestedUri = request.url;
+        return http.Response('{"status": "ok"}', 200);
+      });
+
+      client = HttpCacheClient(
+        baseUrl: 'https://api.example.com',
+        cacheTimeout: Duration(minutes: 5),
+        httpClient: mockClient,
+      );
+    });
+
+    test('includes query parameters in the request URL', () async {
+      await client.get('/user', queryParams: {'id': '123', 'sort': 'name'});
+
+      expect(lastRequestedUri.toString(), 'https://api.example.com/user?id=123&sort=name');
+    });
+
+    test('returns cached response on repeated request with same query params', () async {
+      final first = await client.get('/user', queryParams: {'id': '1'});
+      final second = await client.get('/user', queryParams: {'id': '1'});
+
+      expect(first.body, '{"status": "ok"}');
+      expect(second.body, '{"status": "ok"}');
+      expect(callCount, 1); // Only one network call due to caching
+    });
+
+    test('treats different query parameters as different cache keys', () async {
+      final first = await client.get('/user', queryParams: {'id': '1'});
+      final second = await client.get('/user', queryParams: {'id': '2'});
+
+      expect(first.body, '{"status": "ok"}');
+      expect(second.body, '{"status": "ok"}');
+      expect(callCount, 2); // Two different calls because of different query params
+    });
+  });
 }
