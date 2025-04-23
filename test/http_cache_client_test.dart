@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:http_cache_client/http_cache_client.dart';
+import 'package:http_cache_client/utils.dart';
 
 void main() {
   test('Should cache GET response and skip second network call', () async {
@@ -74,11 +75,59 @@ void main() {
       await client.get('/two');
       expect(callCount, 2); // All cached
 
-      client.invalidateCache(uri: '/one', method: 'GET'); // Invalidate one
+      client.invalidateCache(
+          uri: '/one', method: REQUEST_METHODS.GET); // Invalidate one
 
       await client.get('/one'); // Should hit network again
       await client.get('/two'); // Still cached
       expect(callCount, 3);
+    });
+  });
+
+  group('HttpCacheClient caching (no cache for PUT/DELETE)', () {
+    late int callCount;
+    late HttpCacheClient client;
+
+    setUp(() {
+      callCount = 0;
+
+      final mockClient = MockClient((request) async {
+        callCount++;
+        return http.Response('{"status": "ok"}', 200);
+      });
+
+      client = HttpCacheClient(
+        baseUrl: 'https://api.example.com',
+        cacheTimeout: Duration(minutes: 1),
+        httpClient: mockClient,
+      );
+    });
+
+    test('PUT request should not cache', () async {
+      await client.put('/user/123', headers: {}, body: '{"name": "Alice"}');
+      expect(callCount, 1); // Network call
+
+      // Call again — should not be cached
+      await client.put('/user/123', headers: {}, body: '{"name": "Bob"}');
+      expect(callCount, 2); // Another network call
+    });
+
+    test('DELETE request should not cache', () async {
+      await client.delete('/user/123');
+      expect(callCount, 1); // Network call
+
+      // Call again — should not be cached
+      await client.delete('/user/123');
+      expect(callCount, 2); // Another network call
+    });
+
+    test('GET request should cache the response', () async {
+      await client.get('/data');
+      expect(callCount, 1); // Network call
+
+      // Call again — should be cached
+      await client.get('/data');
+      expect(callCount, 1); // Still cached, no network call
     });
   });
 }

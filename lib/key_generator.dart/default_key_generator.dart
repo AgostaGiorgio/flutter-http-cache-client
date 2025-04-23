@@ -1,15 +1,17 @@
 import 'dart:convert';
+import 'package:http_cache_client/utils.dart';
+
 import 'key_generator.dart';
 
 class DefaultKeyGenerator implements KeyGenerator {
   @override
   String generateKey({
-    required String method,
+    required REQUEST_METHODS method,
     required Uri url,
     Object? body,
   }) {
     final keyParts = [
-      method.toUpperCase(),
+      method.toString(),
       url.toString(),
       jsonEncode(body ?? {}),
     ];
