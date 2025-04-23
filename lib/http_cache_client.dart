@@ -50,7 +50,6 @@ class HttpCacheClient {
     final cacheKey = _keyGenerator.generateKey(
       method: method,
       url: fullUrl,
-      headers: headers,
       body: body,
     );
     final now = DateTime.now();
@@ -74,6 +73,26 @@ class HttpCacheClient {
 
     _cache[cacheKey] = _CachedResponse(response, now);
     return response;
+  }
+
+  void clearCache() {
+    _cache.clear();
+  }
+
+  void invalidateCache({
+    required String uri,
+    required String method,
+    Object? body,
+  }) {
+    final fullUrl = Uri.parse('$baseUrl$uri');
+
+    final key = _keyGenerator.generateKey(
+      method: method,
+      url: fullUrl,
+      body: body,
+    );
+
+    _cache.remove(key);
   }
 }
 

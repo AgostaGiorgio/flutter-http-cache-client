@@ -6,13 +6,11 @@ class DefaultKeyGenerator implements KeyGenerator {
   String generateKey({
     required String method,
     required Uri url,
-    Map<String, String>? headers,
     Object? body,
   }) {
     final keyParts = [
       method.toUpperCase(),
       url.toString(),
-      jsonEncode(headers ?? {}),
       jsonEncode(body ?? {}),
     ];
     return keyParts.join('|');

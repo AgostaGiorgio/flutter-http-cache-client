@@ -32,4 +32,53 @@ void main() {
     expect(response2.body, contains('Alice'));
     expect(callCount, 1); // Still 1 — no network call
   });
+
+  group('HttpCacheClient cache control', () {
+    late int callCount;
+    late HttpCacheClient client;
+
+    setUp(() {
+      callCount = 0;
+
+      final mockClient = MockClient((request) async {
+        callCount++;
+        return http.Response('{"status": "ok"}', 200);
+      });
+
+      client = HttpCacheClient(
+        baseUrl: 'https://api.example.com',
+        cacheTimeout: Duration(minutes: 1),
+        httpClient: mockClient,
+      );
+    });
+
+    test('clearCache() should remove all cached entries', () async {
+      await client.get('/data');
+      expect(callCount, 1); // Real request
+
+      await client.get('/data');
+      expect(callCount, 1); // Should be cached
+
+      client.clearCache(); // Clear everything
+
+      await client.get('/data');
+      expect(callCount, 2); // Should hit network again
+    });
+
+    test('invalidateCache(uri) should remove only one cached entry', () async {
+      await client.get('/one');
+      await client.get('/two');
+      expect(callCount, 2); // Two network calls
+
+      await client.get('/one');
+      await client.get('/two');
+      expect(callCount, 2); // All cached
+
+      client.invalidateCache(uri: '/one', method: 'GET'); // Invalidate one
+
+      await client.get('/one'); // Should hit network again
+      await client.get('/two'); // Still cached
+      expect(callCount, 3);
+    });
+  });
 }
