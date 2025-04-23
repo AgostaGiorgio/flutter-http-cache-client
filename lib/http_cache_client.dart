@@ -61,16 +61,12 @@ class HttpCacheClient {
   }
 
   Future<http.Response> delete(String uri,
-      {Map<String, String>? headers,
-      Map<String, String>? queryParams,
-      Object? body}) {
+      {Map<String, String>? headers, Map<String, String>? queryParams}) {
     return _handleRequest(
-      method: REQUEST_METHODS.DELETE,
-      uri: uri,
-      headers: headers,
-      queryParams: queryParams,
-      body: body,
-    );
+        method: REQUEST_METHODS.DELETE,
+        uri: uri,
+        headers: headers,
+        queryParams: queryParams);
   }
 
   Future<http.Response> _handleRequest(
@@ -82,49 +78,71 @@ class HttpCacheClient {
     final fullUrl =
         Uri.parse('$baseUrl$uri').replace(queryParameters: queryParams);
 
-    if (isMethodNotCacheble(method)) {
-      if (method == REQUEST_METHODS.PUT) {
-        return await _httpClient.put(
-          fullUrl,
+    late http.Response? response;
+    if (isMethodCacheble(method)) {
+      final cacheKey = _keyGenerator.generateKey(
+        method: method,
+        url: fullUrl,
+        body: body,
+      );
+      response = _getFromCache(
+          cacheKey: cacheKey, url: fullUrl, method: method, body: body);
+      if (response != null) {
+        return response;
+      } else {
+        response = await _makeHttpRequest(
+          method: method,
+          url: fullUrl,
           headers: headers,
-          body: body is Map ? jsonEncode(body) : body,
+          body: body,
         );
-      } else if (method == REQUEST_METHODS.DELETE) {
-        return await _httpClient.delete(
-          fullUrl,
-          headers: headers,
-          body: body is Map ? jsonEncode(body) : body,
-        );
+        _cache[cacheKey] = _CachedResponse(response, DateTime.now());
+        return response;
       }
-      throw UnsupportedError('Method $method not supported');
+    } else {
+      return _makeHttpRequest(
+        method: method,
+        url: fullUrl,
+        headers: headers,
+        body: body,
+      );
     }
+  }
 
-    final cacheKey = _keyGenerator.generateKey(
-      method: method,
-      url: fullUrl,
-      body: body,
-    );
+  http.Response? _getFromCache({
+    required String cacheKey,
+    required Uri url,
+    required REQUEST_METHODS method,
+    Object? body,
+  }) {
     final now = DateTime.now();
     final cached = _cache[cacheKey];
     if (cached != null && now.difference(cached.timestamp) < cacheTimeout) {
       return cached.response;
     }
+    return null;
+  }
 
-    late http.Response response;
-    if (method == REQUEST_METHODS.GET) {
-      response = await _httpClient.get(fullUrl, headers: headers);
-    } else if (method == REQUEST_METHODS.POST) {
-      response = await _httpClient.post(
-        fullUrl,
-        headers: headers,
-        body: body is Map ? jsonEncode(body) : body,
-      );
-    } else {
-      throw UnsupportedError('Method $method not supported');
+  Future<http.Response> _makeHttpRequest({
+    required REQUEST_METHODS method,
+    required Uri url,
+    Map<String, String>? headers,
+    Object? body,
+  }) async {
+    switch (method) {
+      case REQUEST_METHODS.GET:
+        return _httpClient.get(url, headers: headers);
+      case REQUEST_METHODS.POST:
+        return _httpClient.post(url,
+            headers: headers, body: body is Map ? jsonEncode(body) : body);
+      case REQUEST_METHODS.PUT:
+        return _httpClient.put(url,
+            headers: headers, body: body is Map ? jsonEncode(body) : body);
+      case REQUEST_METHODS.DELETE:
+        return _httpClient.delete(url, headers: headers);
+      default:
+        throw Exception('Unsupported HTTP method');
     }
-
-    _cache[cacheKey] = _CachedResponse(response, now);
-    return response;
   }
 
   void clearCache() {
