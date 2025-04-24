@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:http_cache_client/utils.dart';
+import 'package:simple_http_cache_client/utils.dart';
 
 import 'key_generator.dart';
 

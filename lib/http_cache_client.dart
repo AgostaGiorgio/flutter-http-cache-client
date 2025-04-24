@@ -3,9 +3,9 @@ library http_cache_client;
 import 'dart:convert';
 import 'dart:collection';
 import 'package:http/http.dart' as http;
-import 'package:http_cache_client/key_generator.dart/default_key_generator.dart';
-import 'package:http_cache_client/key_generator.dart/key_generator.dart';
-import 'package:http_cache_client/utils.dart';
+import 'package:simple_http_cache_client/key_generator.dart/default_key_generator.dart';
+import 'package:simple_http_cache_client/key_generator.dart/key_generator.dart';
+import 'package:simple_http_cache_client/utils.dart';
 
 /// A simple HTTP client with caching support.
 class HttpCacheClient {

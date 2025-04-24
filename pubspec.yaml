@@ -1,6 +1,8 @@
-name: http_cache_client
+name: simple_http_cache_client
 description: "A new Flutter package project."
 version: 0.0.1
+repository: https://github.com/AgostaGiorgio/flutter-http-cache-client/tree/master
+
 homepage:
 
 environment:
