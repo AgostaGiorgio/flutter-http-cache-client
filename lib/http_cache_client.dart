@@ -25,25 +25,30 @@ class HttpCacheClient {
         _httpClient = httpClient ?? http.Client();
 
   Future<http.Response> get(String uri,
-      {Map<String, String>? headers, Map<String, String>? queryParams}) async {
+      {Map<String, String>? headers,
+      Map<String, String>? queryParams,
+      bool cacheResult = true}) async {
     return _handleRequest(
       method: REQUEST_METHODS.GET,
       uri: uri,
       headers: headers,
       queryParams: queryParams,
+      cacheResult: cacheResult,
     );
   }
 
   Future<http.Response> post(String uri,
       {Map<String, String>? headers,
       Map<String, String>? queryParams,
-      Object? body}) async {
+      Object? body,
+      bool cacheResult = true}) async {
     return _handleRequest(
       method: REQUEST_METHODS.POST,
       uri: uri,
       headers: headers,
       queryParams: queryParams,
       body: body,
+      cacheResult: cacheResult,
     );
   }
 
@@ -74,12 +79,13 @@ class HttpCacheClient {
       required String uri,
       Map<String, String>? headers,
       Map<String, String>? queryParams,
-      Object? body}) async {
+      Object? body,
+      bool cacheResult = true}) async {
     final fullUrl =
         Uri.parse('$baseUrl$uri').replace(queryParameters: queryParams);
 
     late http.Response? response;
-    if (isMethodCacheble(method)) {
+    if (isMethodCacheble(method) && cacheResult) {
       final cacheKey = _keyGenerator.generateKey(
         method: method,
         url: fullUrl,
@@ -165,7 +171,7 @@ class HttpCacheClient {
 
     _cache.remove(key);
   }
-  
+
   Future<http.Response> handleRedirects(http.Response response) async {
     if (response.statusCode == 302 || response.statusCode == 301) {
       final location = response.headers['location'];
