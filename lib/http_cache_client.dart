@@ -133,8 +133,9 @@ class HttpCacheClient {
       case REQUEST_METHODS.GET:
         return _httpClient.get(url, headers: headers);
       case REQUEST_METHODS.POST:
-        return _httpClient.post(url,
+        final response = await _httpClient.post(url,
             headers: headers, body: body is Map ? jsonEncode(body) : body);
+        return handleRedirects(response);
       case REQUEST_METHODS.PUT:
         return _httpClient.put(url,
             headers: headers, body: body is Map ? jsonEncode(body) : body);
@@ -163,6 +164,17 @@ class HttpCacheClient {
     );
 
     _cache.remove(key);
+  }
+  
+  Future<http.Response> handleRedirects(http.Response response) async {
+    if (response.statusCode == 302 || response.statusCode == 301) {
+      final location = response.headers['location'];
+      if (location != null) {
+        final newUrl = Uri.parse(location);
+        return await _httpClient.get(newUrl);
+      }
+    }
+    return response;
   }
 }
 
