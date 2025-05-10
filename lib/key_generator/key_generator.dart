@@ -1,4 +1,4 @@
-import 'package:simple_http_cache_client/utils.dart';
+import 'package:http_cached_client/utils.dart';
 
 /// Interface for cache key generation strategies.
 ///

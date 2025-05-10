@@ -1,5 +1,5 @@
-import 'package:simple_http_cache_client/http_cache_client.dart';
-import 'package:simple_http_cache_client/utils.dart';
+import 'package:http_cached_client/http_cache_client.dart';
+import 'package:http_cached_client/utils.dart';
 
 void main() async {
   // Create an instance of HttpCacheClient with a base URL and default cache timeout
