@@ -1,5 +1,5 @@
 name: http_cached_client
-description: "A new Flutter package project."
+description: "A lightweight Flutter package that wraps the standard `http` client with a caching mechanism"
 version: 1.0.0
 repository: https://github.com/AgostaGiorgio/flutter-http-cache-client/tree/master
 
