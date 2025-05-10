@@ -47,7 +47,7 @@ class HttpCacheClient {
       this.cacheTimeout = const Duration(minutes: 5),
       KeyGenerator? keyGenerator,
       http.Client? httpClient})
-      : _keyGenerator = keyGenerator ?? DefaultKeyGenerator(),
+      : _keyGenerator = keyGenerator ?? const DefaultKeyGenerator(),
         _httpClient = httpClient ?? http.Client();
 
   /// Performs a GET request with optional caching.
@@ -205,8 +205,6 @@ class HttpCacheClient {
             headers: headers, body: body is Map ? jsonEncode(body) : body);
       case REQUEST_METHODS.DELETE:
         return _httpClient.delete(url, headers: headers);
-      default:
-        throw Exception('Unsupported HTTP method');
     }
   }
 
