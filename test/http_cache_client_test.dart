@@ -156,10 +156,12 @@ void main() {
     test('includes query parameters in the request URL', () async {
       await client.get('/user', queryParams: {'id': '123', 'sort': 'name'});
 
-      expect(lastRequestedUri.toString(), 'https://api.example.com/user?id=123&sort=name');
+      expect(lastRequestedUri.toString(),
+          'https://api.example.com/user?id=123&sort=name');
     });
 
-    test('returns cached response on repeated request with same query params', () async {
+    test('returns cached response on repeated request with same query params',
+        () async {
       final first = await client.get('/user', queryParams: {'id': '1'});
       final second = await client.get('/user', queryParams: {'id': '1'});
 
@@ -174,7 +176,8 @@ void main() {
 
       expect(first.body, '{"status": "ok"}');
       expect(second.body, '{"status": "ok"}');
-      expect(callCount, 2); // Two different calls because of different query params
+      expect(callCount,
+          2); // Two different calls because of different query params
     });
   });
 }

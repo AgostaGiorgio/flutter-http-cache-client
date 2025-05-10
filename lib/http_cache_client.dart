@@ -266,7 +266,7 @@ class HttpCacheClient {
 class _CachedResponse {
   /// The cached HTTP response.
   final http.Response response;
-  
+
   /// The time when the response was cached.
   final DateTime timestamp;
 

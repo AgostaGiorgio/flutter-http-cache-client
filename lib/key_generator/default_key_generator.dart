@@ -10,7 +10,7 @@ import 'key_generator.dart';
 class DefaultKeyGenerator implements KeyGenerator {
   /// Creates a new default key generator.
   const DefaultKeyGenerator();
-  
+
   @override
   String generateKey({
     required REQUEST_METHODS method,

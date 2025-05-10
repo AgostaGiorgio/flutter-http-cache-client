@@ -42,7 +42,7 @@ class _HttpCacheClientDemoState extends State<HttpCacheClientDemo> {
   String requestSource = '';
   List<Map<String, dynamic>> posts = [];
   int selectedPostId = 1;
-  
+
   // Tracking request times to demonstrate caching
   Stopwatch stopwatch = Stopwatch();
 
@@ -64,10 +64,11 @@ class _HttpCacheClientDemoState extends State<HttpCacheClientDemo> {
       final response = await client.get('/posts/$selectedPostId');
       stopwatch.stop();
 
-      // Check if the response is coming from cache 
+      // Check if the response is coming from cache
       // (This is a simplistic way - in reality we'd need to modify the library to return this info)
-      final isCached = stopwatch.elapsedMilliseconds < 100; // Assumption: cache responses are very fast
-      
+      final isCached = stopwatch.elapsedMilliseconds <
+          100; // Assumption: cache responses are very fast
+
       setState(() {
         isLoading = false;
         responseText = response.body;
@@ -88,9 +89,10 @@ class _HttpCacheClientDemoState extends State<HttpCacheClientDemo> {
     });
 
     try {
-      final response = await client.get('/posts', queryParams: {'_limit': '10'});
+      final response =
+          await client.get('/posts', queryParams: {'_limit': '10'});
       final List<dynamic> data = json.decode(response.body);
-      
+
       setState(() {
         isLoading = false;
         posts = data.map((item) => item as Map<String, dynamic>).toList();
@@ -113,11 +115,12 @@ class _HttpCacheClientDemoState extends State<HttpCacheClientDemo> {
         '/posts',
         body: {
           'title': 'New Post from HTTP Cache Client',
-          'body': 'This is a new post created with the HTTP Cache Client library',
+          'body':
+              'This is a new post created with the HTTP Cache Client library',
           'userId': 1,
         },
       );
-      
+
       setState(() {
         isLoading = false;
         responseText = response.body;
@@ -170,7 +173,7 @@ class _HttpCacheClientDemoState extends State<HttpCacheClientDemo> {
                     const Text(
                       'HTTP Cache Client',
                       style: TextStyle(
-                        fontSize: 20, 
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -187,9 +190,9 @@ class _HttpCacheClientDemoState extends State<HttpCacheClientDemo> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Post selection
             Row(
               children: [
@@ -206,14 +209,16 @@ class _HttpCacheClientDemoState extends State<HttpCacheClientDemo> {
                         });
                       }
                     },
-                    items: posts.isNotEmpty 
-                        ? posts.map<DropdownMenuItem<int>>((Map<String, dynamic> post) {
+                    items: posts.isNotEmpty
+                        ? posts.map<DropdownMenuItem<int>>(
+                            (Map<String, dynamic> post) {
                             return DropdownMenuItem<int>(
                               value: post['id'] as int,
                               child: Text('${post['id']}: ${post['title']}'),
                             );
                           }).toList()
-                        : [1, 2, 3, 4, 5].map<DropdownMenuItem<int>>((int value) {
+                        : [1, 2, 3, 4, 5]
+                            .map<DropdownMenuItem<int>>((int value) {
                             return DropdownMenuItem<int>(
                               value: value,
                               child: Text('Post $value'),
@@ -223,9 +228,9 @@ class _HttpCacheClientDemoState extends State<HttpCacheClientDemo> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Action buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -242,9 +247,9 @@ class _HttpCacheClientDemoState extends State<HttpCacheClientDemo> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 10),
-            
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -260,9 +265,9 @@ class _HttpCacheClientDemoState extends State<HttpCacheClientDemo> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Response display
             Expanded(
               child: Card(
@@ -284,8 +289,8 @@ class _HttpCacheClientDemoState extends State<HttpCacheClientDemo> {
                           if (requestSource.isNotEmpty)
                             Chip(
                               label: Text(requestSource),
-                              backgroundColor: requestSource == 'from cache' 
-                                  ? Colors.green.shade100 
+                              backgroundColor: requestSource == 'from cache'
+                                  ? Colors.green.shade100
                                   : requestSource == 'from network'
                                       ? Colors.blue.shade100
                                       : Colors.amber.shade100,
@@ -322,7 +327,7 @@ class _HttpCacheClientDemoState extends State<HttpCacheClientDemo> {
       ),
     );
   }
-  
+
   String _prettyPrintJson(String jsonString) {
     try {
       var jsonObject = json.decode(jsonString);

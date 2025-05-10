@@ -6,13 +6,13 @@
 enum REQUEST_METHODS {
   /// HTTP GET method - Used to retrieve resources
   GET,
-  
+
   /// HTTP POST method - Used to create new resources
   POST,
-  
+
   /// HTTP PUT method - Used to update existing resources
   PUT,
-  
+
   /// HTTP DELETE method - Used to delete resources
   DELETE,
 }
